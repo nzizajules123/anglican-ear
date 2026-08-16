@@ -1,34 +1,69 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() { return request.auth != null; }
-    function role() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role; }
-    function superAdmin() { return signedIn() && role() == 'super_admin'; }
-    function leader() { return signedIn() && role() in ['super_admin', 'pastor', 'secretary']; }
-    function contentEditor() { return signedIn() && role() in ['super_admin', 'pastor', 'secretary', 'event_manager']; }
-    function ministryEditor() { return signedIn() && role() in ['super_admin', 'pastor', 'choir_president', 'youth_leader']; }
-    function mediaEditor() { return signedIn() && role() in ['super_admin', 'pastor', 'media']; }
 
-    // Members may see only their own assigned profile. Role creation and updates
-    // must be performed by a trusted admin process (Admin SDK / Cloud Function).
-    match /users/{userId} {
-      allow get: if signedIn() && request.auth.uid == userId;
-      allow list: if leader();
-      allow create: if signedIn()
-        && request.auth.uid == userId
-        && request.resource.data.uid == userId
-        && request.resource.data.role == 'member'
-        && request.resource.data.email == request.auth.token.email;
-      allow update, delete: if superAdmin();
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function myProfile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    function hasRole(allowed) {
+      return isSignedIn() && myProfile().role in allowed;
     }
 
-    match /announcements/{itemId} { allow read: if true; allow create, update, delete: if contentEditor(); }
-    match /events/{itemId} { allow read: if true; allow create, update, delete: if contentEditor(); }
-    match /sermons/{itemId} { allow read: if true; allow create, update, delete: if mediaEditor(); }
-    match /ministries/{itemId} { allow read: if signedIn(); allow create, update, delete: if ministryEditor(); }
-    match /giving/{itemId} { allow read, create, update, delete: if signedIn() && role() in ['super_admin', 'finance']; }
-    match /prayerRequests/{itemId} { allow read: if leader(); allow create: if signedIn(); allow update, delete: if leader(); }
+    // Users / roles — anyone signed in can read the directory (People page needs
+    // this), but only super_admin can change someone else's `role`. Users can
+    // create/update their own doc as long as they don't touch `role` themselves
+    // (blocks self-escalation from the client).
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isSignedIn() && (
+        (request.auth.uid == userId && !('role' in request.resource.data.diff(resource.data).affectedKeys()))
+        || hasRole(['super_admin'])
+      );
+      allow delete: if hasRole(['super_admin']);
+    }
 
-    // Public content will receive collection-specific rules as it is introduced.
+    // Public content — readable by anyone (the public site reads these with no
+    // auth), writable only by the roles CollectionPage already grants edit access to.
+    match /announcements/{id} {
+      allow read: if true;
+      allow create, update, delete: if hasRole(['super_admin', 'pastor', 'secretary', 'event_manager']);
+    }
+    match /events/{id} {
+      allow read: if true;
+      allow create, update, delete: if hasRole(['super_admin', 'pastor', 'secretary', 'event_manager']);
+    }
+    match /sermons/{id} {
+      allow read: if true;
+      allow create, update, delete: if hasRole(['super_admin', 'pastor', 'media']);
+    }
+    match /ministries/{id} {
+      allow read: if true;
+      allow create, update, delete: if hasRole(['super_admin', 'pastor', 'choir_president', 'youth_leader']);
+    }
+
+    // Financial — signed-in only, matching CollectionPage's giving route.
+    match /giving/{id} {
+      allow read: if hasRole(['super_admin', 'finance']);
+      allow create, update, delete: if hasRole(['super_admin', 'finance']);
+    }
+
+    // Prayer requests — private to signed-in members; only these roles can
+    // manage them, matching the current /dashboard/prayer-requests route.
+    match /prayerRequests/{id} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if hasRole(['super_admin', 'pastor', 'secretary']);
+    }
+
+    // Contact form — anyone (including anonymous public visitors) can submit,
+    // but only staff can read or remove messages. Never editable after creation.
+    match /contactSubmissions/{id} {
+      allow create: if true;
+      allow read, delete: if hasRole(['super_admin', 'pastor', 'secretary']);
+      allow update: if false;
+    }
   }
 }

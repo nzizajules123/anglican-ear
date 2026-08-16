@@ -8,7 +8,7 @@ export function DashboardLayout() {
   const can = (...roles: string[]) => Boolean(role && roles.includes(role))
   const links: Array<[string, string, boolean]> = [
     ['Overview', '/dashboard', true], ['Analytics', '/dashboard/analytics', can('super_admin', 'pastor', 'secretary')], ['Announcements', '/dashboard/announcements', true], ['Events', '/dashboard/events', true], ['Sermons', '/dashboard/sermons', true], ['Prayer care', '/dashboard/prayer-requests', true],
-    ['Ministries', '/dashboard/ministries', can('super_admin', 'pastor', 'choir_president', 'youth_leader')], ['Giving', '/dashboard/giving', can('super_admin', 'finance')], ['People & roles', '/dashboard/people', can('super_admin', 'pastor', 'secretary')], ['My profile', '/dashboard/profile', true],
+    ['Ministries', '/dashboard/ministries', can('super_admin', 'pastor', 'choir_president', 'youth_leader')], ['Giving', '/dashboard/giving', can('super_admin', 'finance')], ['Contact messages', '/dashboard/contact-submissions', can('super_admin', 'pastor', 'secretary')], ['People & roles', '/dashboard/people', can('super_admin', 'pastor', 'secretary')], ['My profile', '/dashboard/profile', true],
   ]
   return (
     <div className="dashboard-shell min-h-screen md:flex">

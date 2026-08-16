@@ -7,10 +7,12 @@ import { CompleteProfilePage } from './pages/auth/CompleteProfilePage'
 import { DashboardPage } from './pages/dashboard/DashboardPage'
 import { AnalyticsPage } from './pages/dashboard/AnalyticsPage'
 import { CollectionPage } from './pages/dashboard/CollectionPage'
+import { ContactSubmissionsPage } from './pages/dashboard/ContactSubmissionsPage'
 import { PeoplePage } from './pages/dashboard/PeoplePage'
 import { ProfilePage } from './pages/dashboard/ProfilePage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { ContentPage } from './pages/public/ContentPage'
+import { ContactPage } from './pages/public/ContactPage'
 import { HomePage } from './pages/public/HomePage'
 
 export default function App() {
@@ -20,6 +22,7 @@ export default function App() {
       <Route path="about" element={<ContentPage title="About us" description="Learn about our church, our beliefs, and our community." />} />
       <Route path="events" element={<ContentPage title="Events" description="Upcoming worship services, gatherings, and community events." collection="events" />} />
       <Route path="sermons" element={<ContentPage title="Sermons" description="Watch and listen to messages from our church." collection="sermons" />} />
+      <Route path="contact" element={<ContactPage />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="complete-profile" element={<CompleteProfilePage />} />
     </Route>
@@ -33,6 +36,7 @@ export default function App() {
         <Route path="prayer-requests" element={<CollectionPage collection="prayerRequests" editors={['super_admin', 'pastor', 'secretary']} />} />
         <Route path="ministries" element={<CollectionPage collection="ministries" editors={['super_admin', 'pastor', 'choir_president', 'youth_leader']} />} />
         <Route path="giving" element={<CollectionPage collection="giving" editors={['super_admin', 'finance']} amount />} />
+        <Route path="contact-submissions" element={<ContactSubmissionsPage editors={['super_admin', 'pastor', 'secretary']} />} />
         <Route path="people" element={<PeoplePage />} />
         <Route path="profile" element={<ProfilePage />} />
       </Route>

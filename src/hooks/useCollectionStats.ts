@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { collection, onSnapshot, query, where } from 'firebase/firestore'
+import { collection, onSnapshot } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 
 export interface CollectionStats {
@@ -31,73 +31,48 @@ export function useCollectionStats(): CollectionStats {
 
     const unsubscribes: (() => void)[] = []
 
-    // Get announcements count
-    const unsubAnnouncements = onSnapshot(
-      collection(db, 'announcements'),
-      (snapshot) => {
+    unsubscribes.push(
+      onSnapshot(collection(db, 'announcements'), (snapshot) => {
         setStats((prev) => ({ ...prev, announcements: snapshot.size }))
-      },
-      (error) => {
-        console.error('Error fetching announcements:', error)
-        setStats((prev) => ({ ...prev, error: error.message }))
-      }
+      }, (error) => setStats((prev) => ({ ...prev, error: error.message })))
     )
-    unsubscribes.push(unsubAnnouncements)
 
-    // Get events count
-    const unsubEvents = onSnapshot(
-      query(collection(db, 'events'), where('endDate', '>=', new Date())),
-      (snapshot) => {
+    // NOTE: the create form only ever saves a plain `date` string, not a Timestamp
+    // `endDate` field — so a server-side where('endDate', '>=', now) filter would
+    // always return 0. Counting the whole collection until events get real
+    // start/end fields (see accompanying note).
+    unsubscribes.push(
+      onSnapshot(collection(db, 'events'), (snapshot) => {
         setStats((prev) => ({ ...prev, events: snapshot.size }))
-      },
-      (error) => {
-        console.error('Error fetching events:', error)
-      }
+      }, (error) => setStats((prev) => ({ ...prev, error: error.message })))
     )
-    unsubscribes.push(unsubEvents)
 
-    // Get prayer requests count
-    const unsubPrayerRequests = onSnapshot(
-      query(collection(db, 'prayerRequests'), where('status', '!=', 'resolved')),
-      (snapshot) => {
-        setStats((prev) => ({ ...prev, prayerRequests: snapshot.size }))
-      },
-      (error) => {
-        console.error('Error fetching prayer requests:', error)
-      }
+    // Filtering client-side instead of where('status', '!=', 'resolved') because
+    // Firestore inequality filters exclude docs where the field doesn't exist at
+    // all — and the create form never sets `status` on prayer requests, so the
+    // old query always returned 0.
+    unsubscribes.push(
+      onSnapshot(collection(db, 'prayerRequests'), (snapshot) => {
+        const open = snapshot.docs.filter((d) => (d.data().status || '').toString().toLowerCase() !== 'resolved').length
+        setStats((prev) => ({ ...prev, prayerRequests: open }))
+      }, (error) => setStats((prev) => ({ ...prev, error: error.message })))
     )
-    unsubscribes.push(unsubPrayerRequests)
 
-    // Get sermons count
-    const unsubSermons = onSnapshot(
-      collection(db, 'sermons'),
-      (snapshot) => {
+    unsubscribes.push(
+      onSnapshot(collection(db, 'sermons'), (snapshot) => {
         setStats((prev) => ({ ...prev, sermons: snapshot.size }))
-      },
-      (error) => {
-        console.error('Error fetching sermons:', error)
-      }
+      }, (error) => setStats((prev) => ({ ...prev, error: error.message })))
     )
-    unsubscribes.push(unsubSermons)
 
-    // Get ministries count
-    const unsubMinistries = onSnapshot(
-      collection(db, 'ministries'),
-      (snapshot) => {
+    unsubscribes.push(
+      onSnapshot(collection(db, 'ministries'), (snapshot) => {
         setStats((prev) => ({ ...prev, ministries: snapshot.size }))
-      },
-      (error) => {
-        console.error('Error fetching ministries:', error)
-      }
+      }, (error) => setStats((prev) => ({ ...prev, error: error.message })))
     )
-    unsubscribes.push(unsubMinistries)
 
-    // All data loaded
     setStats((prev) => ({ ...prev, loading: false }))
 
-    return () => {
-      unsubscribes.forEach((unsubscribe) => unsubscribe())
-    }
+    return () => unsubscribes.forEach((unsub) => unsub())
   }, [])
 
   return stats

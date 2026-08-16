@@ -18,3 +18,37 @@
   .dashboard-link { @apply whitespace-nowrap rounded-xl px-3 py-2.5 font-medium text-brand-50 transition hover:bg-white/10 hover:text-white; }
   .dashboard-link-active { @apply bg-white/20 text-white shadow-sm; }
 }
+
+/* iOS-style notification banner: spring slide-down entrance, slide-up exit,
+   and a subtle grain/noise texture layered over the frosted-glass background —
+   matching the look of a native iPhone notification. */
+@keyframes ios-notif-in {
+  0%   { transform: translateY(-140%) scale(0.92); opacity: 0; }
+  55%  { transform: translateY(8%) scale(1.015); opacity: 1; }
+  80%  { transform: translateY(-2%) scale(1); }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes ios-notif-out {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-120%) scale(0.94); opacity: 0; }
+}
+
+.notification-banner {
+  animation: ios-notif-in 620ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  will-change: transform, opacity;
+}
+
+.notification-banner.is-leaving {
+  animation: ios-notif-out 300ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+.notification-noise::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}

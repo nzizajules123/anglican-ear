@@ -15,26 +15,42 @@ const AuthContext = createContext<AuthContextValue>({ user: null, profile: null,
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [loading, setLoading] = useState(Boolean(auth))
+  const [authLoading, setAuthLoading] = useState(Boolean(auth))
+  const [profileLoading, setProfileLoading] = useState(false)
 
   useEffect(() => {
     if (!auth) return
     return onAuthStateChanged(auth, (nextUser) => {
       setUser(nextUser)
-      setLoading(false)
+      setAuthLoading(false)
     })
   }, [])
 
   useEffect(() => {
     if (!user || !db) {
       setProfile(null)
+      setProfileLoading(false)
       return
     }
-    return onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
-      setProfile(snapshot.exists() ? (snapshot.data() as UserProfile) : null)
-    })
+    setProfileLoading(true)
+    return onSnapshot(
+      doc(db, 'users', user.uid),
+      (snapshot) => {
+        setProfile(snapshot.exists() ? (snapshot.data() as UserProfile) : null)
+        setProfileLoading(false)
+      },
+      () => {
+        // Permission-denied or offline: don't get stuck loading forever.
+        setProfile(null)
+        setProfileLoading(false)
+      }
+    )
   }, [user])
 
+  // Stay "loading" until we know both auth state AND (if signed in) the profile —
+  // otherwise ProtectedRoute can briefly see user-set/profile-null and misroute
+  // a real returning user to /complete-profile for one render.
+  const loading = authLoading || (Boolean(user) && profileLoading)
   const value = useMemo(() => ({ user, profile, loading }), [user, profile, loading])
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
