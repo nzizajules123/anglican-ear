@@ -3,24 +3,46 @@ import { useCollectionStats, useAdvancedSearch } from '../../hooks'
 import { useDashboardMetrics, getLastNDaysData } from '../../hooks/useDashboardMetrics'
 import { ContentDistributionChart, ContentStatusChart, ActivityTrendChart } from '../../components/dashboard/DashboardCharts'
 import { Link } from 'react-router-dom'
+import { useMyContributions } from '../../hooks/useMyContributions'
+import { can } from '../../lib/permissions'
+import { roleLabels } from '../../types/roles'
 
 export function AnalyticsPage() {
-  const { profile } = useAuth()
+  const { user, profile } = useAuth()
   const stats = useCollectionStats()
   const metrics = useDashboardMetrics()
   const trendData = getLastNDaysData(7)
 
-  const canViewAnalytics = ['super_admin', 'pastor', 'secretary'].includes(profile?.role ?? '')
+  // Only a super admin or pastor sees parish-wide numbers. Everyone else
+  // analyses the records they created themselves.
+  const siteWide = can(profile?.role, 'siteWideAnalytics')
+  const mine = useMyContributions(user?.uid)
 
-  if (!canViewAnalytics) {
+  if (!siteWide) {
     return (
       <section>
-        <p className="eyebrow">Analytics</p>
-        <h1 className="page-title">Access Restricted</h1>
-        <div className="mt-6 rounded-lg bg-yellow-50 p-6">
-          <p className="text-yellow-900">
-            You don't have permission to view analytics. Contact your administrator for access.
-          </p>
+        <p className="eyebrow">My analytics</p>
+        <h1 className="page-title">My contributions</h1>
+        <p className="mt-2 max-w-2xl text-stone-600">
+          These figures cover only the records you created as {profile ? roleLabels[profile.role] : 'a member'}.
+          Parish-wide analytics are reserved for the super admin and the pastor.
+        </p>
+
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="milk-card rounded-lg p-6">
+            <p className="text-sm font-medium text-brand-700">My total items</p>
+            <p className="mt-2 text-3xl font-bold text-brand-900">{mine.loading ? '—' : mine.total}</p>
+            <p className="mt-1 text-xs text-stone-500">Created by you</p>
+          </div>
+          {['announcements', 'events', 'sermons', 'ministries'].map((name) => (
+            <div key={name} className="milk-card rounded-lg p-6">
+              <p className="text-sm font-medium capitalize text-brand-700">My {name}</p>
+              <p className="mt-2 text-3xl font-bold text-brand-900">{mine.loading ? '—' : mine.counts[name] ?? 0}</p>
+              <Link to={`/dashboard/${name}`} className="mt-2 inline-block text-xs font-bold text-brand-600 hover:text-brand-700">
+                Open →
+              </Link>
+            </div>
+          ))}
         </div>
       </section>
     )

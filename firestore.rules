@@ -11,6 +11,13 @@ service cloud.firestore {
     function hasRole(allowed) {
       return isSignedIn() && myProfile().role in allowed;
     }
+    // Choir room access: choir leadership/clergy, or an approved choir member.
+    function isChoirMember() {
+      return isSignedIn() && (
+        myProfile().role in ['super_admin', 'pastor', 'choir_president', 'media']
+        || (myProfile().choirStatus == 'approved')
+      );
+    }
 
     // Users / roles — anyone signed in can read the directory (People page needs
     // this), but only super_admin can change someone else's `role`. Users can
@@ -56,6 +63,36 @@ service cloud.firestore {
     match /prayerRequests/{id} {
       allow read: if isSignedIn();
       allow create, update, delete: if hasRole(['super_admin', 'pastor', 'secretary']);
+    }
+
+    // Choir chat rooms — only choir members may read or post. A member can only
+    // send as themselves, and can only delete their own message.
+    match /chatRooms/{roomId} {
+      allow read: if isChoirMember();
+      allow create, update: if isChoirMember();
+
+      match /messages/{messageId} {
+        allow read: if isChoirMember();
+        allow create: if isChoirMember() && request.resource.data.senderId == request.auth.uid;
+        allow update: if false;
+        allow delete: if isChoirMember() && (
+          resource.data.senderId == request.auth.uid
+          || hasRole(['super_admin', 'pastor', 'choir_president'])
+        );
+      }
+
+      // Per-user read receipts for unread badges.
+      match /reads/{userId} {
+        allow read, write: if isChoirMember() && request.auth.uid == userId;
+      }
+    }
+
+    // WebRTC signalling for choir voice/video calls.
+    match /calls/{callId} {
+      allow read, create, update, delete: if isChoirMember();
+      match /{subcollection}/{docId} {
+        allow read, create, update, delete: if isChoirMember();
+      }
     }
 
     // Contact form — anyone (including anonymous public visitors) can submit,

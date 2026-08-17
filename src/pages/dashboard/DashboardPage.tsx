@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../../features/auth/AuthProvider'
 import { Role } from '../../types/roles'
 import { RolePreviewSwitcher } from '../../components/dashboard/RolePreviewSwitcher'
+import { canPreviewRoles } from '../../lib/permissions'
 import { SuperAdminDashboard } from '../../components/dashboard/roles/SuperAdminDashboard'
 import { PastorDashboard } from '../../components/dashboard/roles/PastorDashboard'
 import { SecretaryDashboard } from '../../components/dashboard/roles/SecretaryDashboard'
@@ -17,7 +18,9 @@ export function DashboardPage() {
   const currentRole: Role = profile?.role || 'member'
   const [simulatedRole, setSimulatedRole] = useState<Role | null>(null)
 
-  const effectiveRole: Role = simulatedRole || currentRole
+  // Only a super admin or a pastor may preview the site as another role.
+  const canPreview = canPreviewRoles(profile)
+  const effectiveRole: Role = (canPreview && simulatedRole) || currentRole
 
   const renderRoleDashboard = () => {
     switch (effectiveRole) {
@@ -45,13 +48,15 @@ export function DashboardPage() {
 
   return (
     <div className="w-full">
-      {/* Role Preview & Simulation Switcher */}
-      <RolePreviewSwitcher
-        currentRole={currentRole}
-        effectiveRole={effectiveRole}
-        onSelectRole={(newRole) => setSimulatedRole(newRole)}
-        onReset={() => setSimulatedRole(null)}
-      />
+      {/* Role Preview & Simulation Switcher — super admin and pastor only */}
+      {canPreview && (
+        <RolePreviewSwitcher
+          currentRole={currentRole}
+          effectiveRole={effectiveRole}
+          onSelectRole={(newRole) => setSimulatedRole(newRole)}
+          onReset={() => setSimulatedRole(null)}
+        />
+      )}
 
       {/* Render the specialized Role Dashboard */}
       {renderRoleDashboard()}

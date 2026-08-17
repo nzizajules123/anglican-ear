@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../../features/auth/AuthProvider'
 import { roleLabels } from '../../types/roles'
+import { canUseChoirChat } from '../../lib/permissions'
+import { NotificationBell } from '../notifications/NotificationBell'
 import {
   LayoutDashboard,
   TrendingUp,
@@ -20,6 +22,7 @@ import {
   X,
   ChevronRight,
   Sparkles,
+  MessageCircle,
 } from 'lucide-react'
 
 export function DashboardLayout() {
@@ -48,11 +51,14 @@ export function DashboardLayout() {
 
   const links = [
     { label: 'Overview', to: '/dashboard', icon: LayoutDashboard, visible: true, end: true },
-    { label: 'Analytics', to: '/dashboard/analytics', icon: TrendingUp, visible: can('super_admin', 'pastor', 'secretary') },
+    // Everyone gets an analytics page; it is scoped to their own records unless
+    // they are the super admin or the pastor.
+    { label: 'Analytics', to: '/dashboard/analytics', icon: TrendingUp, visible: true },
     { label: 'Announcements', to: '/dashboard/announcements', icon: Bell, visible: true },
     { label: 'Events & Services', to: '/dashboard/events', icon: Calendar, visible: true },
     { label: 'Sermons Vault', to: '/dashboard/sermons', icon: BookOpen, visible: true },
     { label: 'Pastoral Prayer Care', to: '/dashboard/prayer-requests', icon: HeartHandshake, visible: true },
+    { label: 'Choir Room', to: '/dashboard/choir-room', icon: MessageCircle, visible: canUseChoirChat(profile) },
     { label: 'Parish Ministries', to: '/dashboard/ministries', icon: Users, visible: can('super_admin', 'pastor', 'choir_president', 'youth_leader') },
     { label: 'Giving & Stewardship', to: '/dashboard/giving', icon: DollarSign, visible: can('super_admin', 'finance', 'pastor') },
     { label: 'Contact Messages', to: '/dashboard/contact-submissions', icon: Mail, visible: can('super_admin', 'pastor', 'secretary') },
@@ -94,6 +100,7 @@ export function DashboardLayout() {
         </div>
 
         <div className="flex items-center gap-2">
+          <NotificationBell tone="dark" />
           <span className="rounded-full bg-amber-400/20 px-2.5 py-1 text-[11px] font-bold text-amber-200 border border-amber-400/30">
             {profile ? roleLabels[profile.role] : 'Member'}
           </span>
@@ -226,6 +233,7 @@ export function DashboardLayout() {
                   {profile ? roleLabels[profile.role] : 'Congregation Member'}
                 </span>
               </div>
+              <NotificationBell tone="dark" />
             </div>
           </div>
 
