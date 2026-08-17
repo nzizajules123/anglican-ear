@@ -1,4 +1,15 @@
-import { addDoc, collection, deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp, updateDoc } from 'firebase/firestore'
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  updateDoc,
+  type UpdateData,
+} from 'firebase/firestore'
 import { db } from './firebase'
 import type { MediaAsset } from './cloudinary'
 
@@ -52,7 +63,7 @@ export async function createEvent(input: Omit<ChurchEvent, 'id' | 'createdAt'>) 
 export async function updateEvent(id: string, input: Partial<ChurchEvent>) {
   if (!db) throw new Error('Firebase is not configured.')
   // Firestore UpdateData typing is strict; stripped payload is safe at runtime.
-  return updateDoc(doc(db, 'events', id), stripUndefined(input) as Parameters<typeof updateDoc>[1])
+  return updateDoc(doc(db, 'events', id), stripUndefined(input) as UpdateData<ChurchEvent>)
 }
 
 export async function deleteEvent(id: string) {
