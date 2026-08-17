@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore'
 import { db } from './firebase'
 import type { MediaAsset } from './cloudinary'
+import { stripUndefined } from './firestoreUtils'
 
 export type ChurchEvent = {
   id: string
@@ -25,15 +26,6 @@ export type ChurchEvent = {
   createdBy?: string
   createdByName?: string
   createdAt?: unknown
-}
-
-/** Firestore rejects any field whose value is `undefined`. Strip them before writes. */
-function stripUndefined<T extends object>(values: T): Partial<T> {
-  const result: Partial<T> = {}
-  for (const key of Object.keys(values) as (keyof T)[]) {
-    if (values[key] !== undefined) result[key] = values[key]
-  }
-  return result
 }
 
 export function subscribeToEvents(handler: (items: ChurchEvent[]) => void) {

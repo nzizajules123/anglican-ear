@@ -1,6 +1,7 @@
 import { addDoc, collection, deleteDoc, doc, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore'
 import { db } from './firebase'
 import type { MediaAsset } from './cloudinary'
+import { stripUndefined } from './firestoreUtils'
 
 export const CHOIR_ROOM_ID = 'choir-general'
 
@@ -35,7 +36,10 @@ export function subscribeToMessages(roomId: string, handler: (messages: ChatMess
 export async function sendMessage(roomId: string, message: Omit<ChatMessage, 'id' | 'createdAt'>) {
   if (!db) throw new Error('Firebase is not configured.')
   await setDoc(doc(db, 'chatRooms', roomId), { name: 'Choir room', updatedAt: serverTimestamp() }, { merge: true })
-  return addDoc(collection(db, 'chatRooms', roomId, 'messages'), { ...message, createdAt: serverTimestamp() })
+  return addDoc(collection(db, 'chatRooms', roomId, 'messages'), {
+    ...stripUndefined(message),
+    createdAt: serverTimestamp(),
+  })
 }
 
 export async function deleteMessage(roomId: string, messageId: string) {

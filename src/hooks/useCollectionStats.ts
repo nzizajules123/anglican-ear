@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { collection, onSnapshot } from 'firebase/firestore'
 import { db } from '../lib/firebase'
-import { anglicanSeedData } from '../lib/church-data'
 
 export interface CollectionStats {
   announcements: number
@@ -16,61 +15,60 @@ export interface CollectionStats {
 
 export function useCollectionStats(): CollectionStats {
   const [stats, setStats] = useState<CollectionStats>({
-    announcements: anglicanSeedData.announcements.length,
-    events: anglicanSeedData.events.length,
-    prayerRequests: anglicanSeedData.prayerRequests.length,
-    sermons: anglicanSeedData.sermons.length,
-    ministries: anglicanSeedData.ministries.length,
-    giving: anglicanSeedData.giving.length,
-    loading: false,
+    announcements: 0,
+    events: 0,
+    prayerRequests: 0,
+    sermons: 0,
+    ministries: 0,
+    giving: 0,
+    loading: true,
     error: null,
   })
 
   useEffect(() => {
-    if (!db) return
+    if (!db) {
+      setStats((prev) => ({ ...prev, loading: false, error: 'Firebase not initialized' }))
+      return
+    }
 
     const firestore = db
     const unsubscribes: (() => void)[] = []
 
     unsubscribes.push(
       onSnapshot(collection(firestore, 'announcements'), (snapshot) => {
-        setStats((prev) => ({ ...prev, announcements: snapshot.empty ? anglicanSeedData.announcements.length : snapshot.size }))
-      }, (error) => setStats((prev) => ({ ...prev, error: error.message })))
+        setStats((prev) => ({ ...prev, announcements: snapshot.size, loading: false }))
+      }, (error) => setStats((prev) => ({ ...prev, error: error.message, loading: false })))
     )
 
     unsubscribes.push(
       onSnapshot(collection(firestore, 'events'), (snapshot) => {
-        setStats((prev) => ({ ...prev, events: snapshot.empty ? anglicanSeedData.events.length : snapshot.size }))
-      }, (error) => setStats((prev) => ({ ...prev, error: error.message })))
+        setStats((prev) => ({ ...prev, events: snapshot.size, loading: false }))
+      }, (error) => setStats((prev) => ({ ...prev, error: error.message, loading: false })))
     )
 
     unsubscribes.push(
       onSnapshot(collection(firestore, 'prayerRequests'), (snapshot) => {
-        if (snapshot.empty) {
-          setStats((prev) => ({ ...prev, prayerRequests: anglicanSeedData.prayerRequests.length }))
-        } else {
-          const open = snapshot.docs.filter((d) => (d.data().status || '').toString().toLowerCase() !== 'resolved').length
-          setStats((prev) => ({ ...prev, prayerRequests: open }))
-        }
-      }, (error) => setStats((prev) => ({ ...prev, error: error.message })))
+        const open = snapshot.docs.filter((d) => (d.data().status || '').toString().toLowerCase() !== 'resolved').length
+        setStats((prev) => ({ ...prev, prayerRequests: open, loading: false }))
+      }, (error) => setStats((prev) => ({ ...prev, error: error.message, loading: false })))
     )
 
     unsubscribes.push(
       onSnapshot(collection(firestore, 'sermons'), (snapshot) => {
-        setStats((prev) => ({ ...prev, sermons: snapshot.empty ? anglicanSeedData.sermons.length : snapshot.size }))
-      }, (error) => setStats((prev) => ({ ...prev, error: error.message })))
+        setStats((prev) => ({ ...prev, sermons: snapshot.size, loading: false }))
+      }, (error) => setStats((prev) => ({ ...prev, error: error.message, loading: false })))
     )
 
     unsubscribes.push(
       onSnapshot(collection(firestore, 'ministries'), (snapshot) => {
-        setStats((prev) => ({ ...prev, ministries: snapshot.empty ? anglicanSeedData.ministries.length : snapshot.size }))
-      }, (error) => setStats((prev) => ({ ...prev, error: error.message })))
+        setStats((prev) => ({ ...prev, ministries: snapshot.size, loading: false }))
+      }, (error) => setStats((prev) => ({ ...prev, error: error.message, loading: false })))
     )
 
     unsubscribes.push(
       onSnapshot(collection(firestore, 'giving'), (snapshot) => {
-        setStats((prev) => ({ ...prev, giving: snapshot.empty ? anglicanSeedData.giving.length : snapshot.size }))
-      }, (error) => setStats((prev) => ({ ...prev, error: error.message })))
+        setStats((prev) => ({ ...prev, giving: snapshot.size, loading: false }))
+      }, (error) => setStats((prev) => ({ ...prev, error: error.message, loading: false })))
     )
 
     return () => unsubscribes.forEach((unsub) => unsub())

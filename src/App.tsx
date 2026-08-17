@@ -18,12 +18,13 @@ import { ContentPage } from './pages/public/ContentPage'
 import { PublicEventsPage } from './pages/public/EventsPage'
 import { ContactPage } from './pages/public/Contactpage'
 import { HomePage } from './pages/public/HomePage'
+import { AboutPage } from './pages/public/AboutPage'
 
 export default function App() {
   return <Routes>
     <Route element={<PublicLayout />}>
       <Route index element={<HomePage />} />
-      <Route path="about" element={<ContentPage title="About us" description="Learn about our church, our beliefs, and our community." />} />
+      <Route path="about" element={<AboutPage />} />
       <Route path="events" element={<PublicEventsPage />} />
       <Route path="sermons" element={<ContentPage title="Sermons" description="Watch and listen to messages from our church." collection="sermons" />} />
       <Route path="contact" element={<ContactPage />} />
