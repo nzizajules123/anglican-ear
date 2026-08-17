@@ -32,6 +32,7 @@ export function useRecentActivity(limitCount = 10): RecentActivityState {
       return
     }
 
+    const firestore = db
     const activities: Map<string, Activity> = new Map()
     const unsubscribes: (() => void)[] = []
 
@@ -42,7 +43,7 @@ export function useRecentActivity(limitCount = 10): RecentActivityState {
     ) => {
       const unsubscribe = onSnapshot(
         query(
-          collection(db, collectionName),
+          collection(firestore, collectionName),
           orderBy('createdAt', 'desc'),
           limit(10)
         ),

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#182a13"/>
+      <stop offset="60%" stop-color="#2a4521"/>
+      <stop offset="100%" stop-color="#141f10"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="50%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <!-- Anglican Canterbury Cross / Cathedral Emblem -->
+  <g transform="translate(256, 256)" fill="url(#gold)">
+    <!-- Central Cross Structure -->
+    <path d="M-28 -170 h56 v114 h114 v56 h-114 v170 h-56 v-170 h-114 v-56 h114 z" stroke="#fff" stroke-width="4"/>
+    <!-- Triangular Crown Flare Points -->
+    <path d="M-40 -170 l40 -35 l40 35 z"/>
+    <path d="M-40 170 l40 35 l40 -35 z"/>
+    <path d="M-170 -40 l-35 40 l35 40 z"/>
+    <path d="M170 -40 l35 40 l-35 40 z"/>
+    <!-- Center Jewel Circle -->
+    <circle cx="0" cy="0" r="32" fill="#182a13" stroke="url(#gold)" stroke-width="8"/>
+    <circle cx="0" cy="0" r="14" fill="url(#gold)"/>
+  </g>
+</svg>

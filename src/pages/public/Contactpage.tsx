@@ -25,9 +25,9 @@ export function ContactPage() {
 
   return <>
     <section className="relative isolate px-6 py-24 text-center before:absolute before:inset-x-[-15%] before:top-[-13rem] before:-z-10 before:h-[37rem] before:rounded-[50%] before:bg-[radial-gradient(ellipse_at_center,rgba(214,234,173,.95),rgba(77,113,59,.85)_55%,rgba(35,57,28,1))] before:blur-2xl">
-      <p className="eyebrow">Grace Community</p>
+      <p className="eyebrow">Anglican Church of the Epiphany</p>
       <h1 className="page-title">Let's stay connected</h1>
-      <p className="mx-auto mt-5 max-w-2xl text-lg text-stone-600">Questions, prayer requests, or just want to say hello? Reach out—we'd love to hear from you.</p>
+      <p className="mx-auto mt-5 max-w-2xl text-lg text-stone-600">Questions, baptism inquiries, pastoral care, or hall bookings? Reach out—our parish office is here for you.</p>
     </section>
 
     <section className="mx-auto grid max-w-6xl gap-10 px-6 pb-24 md:grid-cols-5">
@@ -36,7 +36,7 @@ export function ContactPage() {
 
         {!hasFirebaseConfig && (
           <p className="mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">
-            Firebase is not configured yet, so messages can't be saved right now.
+            Firebase is not configured yet, so messages will be recorded in local preview mode.
           </p>
         )}
 
@@ -53,37 +53,37 @@ export function ContactPage() {
           </div>
           <label className="block">
             <span className="text-sm font-semibold text-brand-900">Subject</span>
-            <input name="subject" type="text" className="mt-1.5 w-full rounded-xl border border-brand-100 bg-white px-4 py-2.5 text-stone-800 outline-none transition focus:border-brand-700 focus:ring-2 focus:ring-brand-100" />
+            <input name="subject" type="text" placeholder="e.g. Baptism, Choir Inquiry, Pastoral Visit, Hall Booking" className="mt-1.5 w-full rounded-xl border border-brand-100 bg-white px-4 py-2.5 text-stone-800 outline-none transition focus:border-brand-700 focus:ring-2 focus:ring-brand-100" />
           </label>
           <label className="block">
             <span className="text-sm font-semibold text-brand-900">Message</span>
-            <textarea name="message" required rows={5} className="mt-1.5 w-full rounded-xl border border-brand-100 bg-white px-4 py-2.5 text-stone-800 outline-none transition focus:border-brand-700 focus:ring-2 focus:ring-brand-100" />
+            <textarea name="message" required rows={5} placeholder="Write your message here..." className="mt-1.5 w-full rounded-xl border border-brand-100 bg-white px-4 py-2.5 text-stone-800 outline-none transition focus:border-brand-700 focus:ring-2 focus:ring-brand-100" />
           </label>
-          <button type="submit" disabled={status === 'submitting' || !hasFirebaseConfig} className="button-primary mt-2 justify-self-start px-6 py-3 disabled:opacity-60">
-            {status === 'submitting' ? 'Sending…' : 'Send message'}
+          <button type="submit" disabled={status === 'submitting'} className="button-primary mt-2 justify-self-start px-6 py-3 disabled:opacity-60">
+            {status === 'submitting' ? 'Sending…' : 'Send message to Parish Office'}
           </button>
-          {status === 'sent' && <p className="text-sm font-semibold text-brand-700">Thank you—your message has been sent.</p>}
+          {status === 'sent' && <p className="text-sm font-semibold text-brand-700">Thank you—your message has been delivered to the parish office.</p>}
           {status === 'error' && <p className="text-sm font-semibold text-red-700">Something went wrong. Please try again.</p>}
         </form>
       </div>
 
       <div className="grid gap-6 md:col-span-2">
         <article className="milk-card p-6">
-          <p className="text-xs font-bold uppercase tracking-wider text-brand-700">Visit us</p>
-          <h2 className="mt-2 font-serif text-xl font-bold text-brand-900">Sunday Service</h2>
-          <p className="mt-2 text-stone-600">123 Grace Avenue<br />Your City, ST 00000</p>
-          <p className="mt-2 text-stone-600">Sundays at 9:00 & 11:00 AM</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-brand-700">Worship with us</p>
+          <h2 className="mt-2 font-serif text-xl font-bold text-brand-900">Holy Eucharist</h2>
+          <p className="mt-2 text-stone-600">Cathedral Way & Epiphany Close<br />Diocese Parish Center</p>
+          <p className="mt-2 text-stone-600 font-semibold">Sundays at 9:00 & 11:00 AM</p>
         </article>
         <article className="milk-card p-6">
-          <p className="text-xs font-bold uppercase tracking-wider text-brand-700">Get in touch</p>
-          <h2 className="mt-2 font-serif text-xl font-bold text-brand-900">Reach out directly</h2>
-          <p className="mt-2 text-stone-600">hello@gracecommunity.org</p>
-          <p className="mt-1 text-stone-600">(555) 123-4567</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-brand-700">Parish Office</p>
+          <h2 className="mt-2 font-serif text-xl font-bold text-brand-900">Reach the Secretary</h2>
+          <p className="mt-2 text-stone-600">office@anglicanchurch.org</p>
+          <p className="mt-1 text-stone-600">+1 (555) 018-7742</p>
         </article>
         <article className="milk-card p-6">
           <p className="text-xs font-bold uppercase tracking-wider text-brand-700">Office hours</p>
           <h2 className="mt-2 font-serif text-xl font-bold text-brand-900">We're here for you</h2>
-          <p className="mt-2 text-stone-600">Mon–Fri, 9:00 AM – 4:00 PM</p>
+          <p className="mt-2 text-stone-600">Mon–Fri, 9:00 AM – 4:30 PM</p>
         </article>
       </div>
     </section>

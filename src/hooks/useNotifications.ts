@@ -34,7 +34,7 @@ function addNotification(notification: Omit<Notification, 'id' | 'leaving'>): st
   notificationStore.set(id, fullNotification)
   notifyListeners()
 
-  if (fullNotification.duration > 0) {
+  if (fullNotification.duration && fullNotification.duration > 0) {
     setTimeout(() => {
       beginRemoveNotification(id)
     }, fullNotification.duration)

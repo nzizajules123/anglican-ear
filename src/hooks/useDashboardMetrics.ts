@@ -67,9 +67,10 @@ export function useDashboardMetrics(): DashboardMetrics {
       }))
     }
 
+    const firestore = db
     const unsubscribes = TRACKED_COLLECTIONS.map((name) =>
       onSnapshot(
-        collection(db, name),
+        collection(firestore, name),
         (snapshot) => {
           let published = 0
           let draft = 0

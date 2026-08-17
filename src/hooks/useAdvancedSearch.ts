@@ -63,6 +63,7 @@ export function useAdvancedSearch(collectionName: string, filters: FilterOptions
     }
 
     const fetchData = async () => {
+      if (!db) return
       try {
         setLoading(true)
         const constraints = buildQuery()

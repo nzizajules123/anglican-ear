@@ -1,0 +1,49 @@
+{
+  "name": "Anglican Church - Parish Portal & Liturgy",
+  "short_name": "Anglican Church",
+  "description": "Anglican Church parish portal for worship, liturgy, sermons, giving, pastoral care, and fellowship.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f8f1",
+  "theme_color": "#1d2b19",
+  "orientation": "portrait-primary",
+  "categories": ["lifestyle", "community", "worship"],
+  "icons": [
+    {
+      "src": "/church-icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Sunday Liturgy & Events",
+      "short_name": "Events",
+      "description": "View upcoming service times and church gatherings",
+      "url": "/events",
+      "icons": [{ "src": "/church-icon.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "Sunday Sermons",
+      "short_name": "Sermons",
+      "description": "Listen to recent sermons and study notes",
+      "url": "/sermons",
+      "icons": [{ "src": "/church-icon.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "Parish Portal Dashboard",
+      "short_name": "Dashboard",
+      "description": "Access your role-based church dashboard",
+      "url": "/dashboard",
+      "icons": [{ "src": "/church-icon.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "Parish Chat",
+      "short_name": "Chat",
+      "description": "Fellowship with church members",
+      "url": "/dashboard/chat",
+      "icons": [{ "src": "/church-icon.svg", "sizes": "96x96" }]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import { useAuth } from '../../features/auth/AuthProvider'
-import { ContactSubmissionsManager } from '../../components/dashboard/ContactSubmissionsManager'
+import { ContactSubmissionsManager } from '../../components/dashboard/Contactsubmissionsmanager'
 import type { Role } from '../../types/roles'
 
 export function ContactSubmissionsPage({ editors }: { editors: Role[] }) {

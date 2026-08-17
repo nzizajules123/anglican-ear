@@ -3,25 +3,63 @@
 @tailwind utilities;
 
 @layer base {
-  body { @apply bg-[#f7f8f1] text-stone-900 antialiased; background-image: radial-gradient(circle at 8% 12%, rgba(215, 235, 178, .8), transparent 28rem), radial-gradient(circle at 90% 5%, rgba(198, 225, 201, .75), transparent 25rem), linear-gradient(135deg, #fbfcf6, #edf3e8); }
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-[#f7f8f1] text-stone-900 antialiased;
+    background-image: radial-gradient(circle at 8% 12%, rgba(215, 235, 178, .8), transparent 28rem), radial-gradient(circle at 90% 5%, rgba(198, 225, 201, .75), transparent 25rem), linear-gradient(135deg, #fbfcf6, #edf3e8);
+  }
   a { @apply transition-colors; }
 }
 
 @layer components {
-  .page-title { @apply mt-2 font-serif text-4xl font-bold tracking-tight text-brand-900 md:text-5xl; }
+  .page-title { @apply mt-2 font-serif text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl md:text-5xl; }
   .eyebrow { @apply text-xs font-bold uppercase tracking-[0.22em] text-brand-700; }
-  .milk-card { @apply rounded-[1.6rem] border border-white/80 bg-white/65 shadow-[0_14px_36px_rgba(48,72,41,0.10)] backdrop-blur-xl; }
-  .field { @apply w-full rounded-xl border border-brand-50 bg-white/80 px-3 py-2.5 text-sm outline-none transition placeholder:text-stone-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-50; }
-  .button-primary { @apply rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-bold text-white shadow-[0_8px_16px_rgba(52,75,44,.18)] transition hover:-translate-y-0.5 hover:bg-brand-900; }
+  .milk-card { @apply rounded-[1.6rem] border border-white/80 bg-white/65 shadow-[0_14px_36px_rgba(48,72,41,0.10)] backdrop-blur-xl transition-all; }
+  .field { @apply w-full rounded-xl border border-brand-50 bg-white/80 px-3.5 py-2.5 text-sm outline-none transition placeholder:text-stone-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-50/70; }
+  .button-primary { @apply inline-flex items-center justify-center rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-bold text-white shadow-[0_8px_16px_rgba(52,75,44,.18)] transition hover:-translate-y-0.5 hover:bg-brand-900 active:translate-y-0 active:scale-95 cursor-pointer; }
   .dashboard-shell { background-image: radial-gradient(ellipse at 45% 0%, rgba(213,231,190,.85), transparent 36rem), linear-gradient(120deg, #f9fbf4, #edf3e7); }
   .dashboard-nav { background: linear-gradient(160deg, #203719, #426337 60%, #6d8754); box-shadow: 15px 0 44px rgba(28,49,23,.15); }
-  .dashboard-link { @apply whitespace-nowrap rounded-xl px-3 py-2.5 font-medium text-brand-50 transition hover:bg-white/10 hover:text-white; }
-  .dashboard-link-active { @apply bg-white/20 text-white shadow-sm; }
+  .dashboard-link { @apply whitespace-nowrap rounded-xl px-3.5 py-2.5 font-medium text-brand-50 transition hover:bg-white/10 hover:text-white; }
+  .dashboard-link-active { @apply bg-white/20 text-white shadow-xs font-bold; }
 }
 
-/* iOS-style notification banner: spring slide-down entrance, slide-up exit,
-   and a subtle grain/noise texture layered over the frosted-glass background —
-   matching the look of a native iPhone notification. */
+/* Scroll reveal animations */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 700ms cubic-bezier(0.16, 1, 0.3, 1), transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes slide-in-left {
+  0% { transform: translateX(-100%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fade-in-scale {
+  0% { opacity: 0; transform: scale(0.98); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.animate-slide-in {
+  animation: slide-in-left 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-fade-in {
+  animation: fade-in-scale 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* iOS-style notification banner */
 @keyframes ios-notif-in {
   0%   { transform: translateY(-140%) scale(0.92); opacity: 0; }
   55%  { transform: translateY(8%) scale(1.015); opacity: 1; }
