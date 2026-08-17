@@ -29,16 +29,19 @@ export function EventManager({ canManage }: { canManage: boolean }) {
     setError('')
     setSaving(true)
     try {
-      await createEvent({
-        title,
-        description,
-        date: date || undefined,
-        location: location || undefined,
+      // Only include fields that have real values — Firestore rejects `undefined`.
+      const payload: Omit<ChurchEvent, 'id' | 'createdAt'> = {
+        title: title.trim(),
         status: 'Scheduled',
         images,
-        createdBy: user?.uid,
-        createdByName: profile?.displayName,
-      })
+      }
+      if (description.trim()) payload.description = description.trim()
+      if (date) payload.date = date
+      if (location.trim()) payload.location = location.trim()
+      if (user?.uid) payload.createdBy = user.uid
+      if (profile?.displayName) payload.createdByName = profile.displayName
+
+      await createEvent(payload)
       setTitle(''); setDate(''); setLocation(''); setDescription(''); setImages([])
     } catch (err) {
       const code = (err as { code?: string })?.code
@@ -64,7 +67,7 @@ export function EventManager({ canManage }: { canManage: boolean }) {
     <section className="space-y-6">
       <div>
         <p className="eyebrow">Church workspace</p>
-        <h1 className="page-title">Events &amp; Services</h1>
+        <h1 className="page-title">Events & Services</h1>
         <p className="mt-2 text-stone-600">
           {canManage ? 'Schedule parish events and upload pictures for the public events page.' : 'Upcoming parish events and services.'}
         </p>
