@@ -17,9 +17,9 @@ export type ChurchEvent = {
 }
 
 /** Firestore rejects any field whose value is `undefined`. Strip them before writes. */
-function stripUndefined<T extends Record<string, unknown>>(values: T): Partial<T> {
-  const result: Partial<T> = {}
-  for (const key of Object.keys(values) as (keyof T)[]) {
+function stripUndefined(values: Record<string, unknown>): Record<string, unknown> {
+  const result: Record<string, unknown> = {}
+  for (const key of Object.keys(values)) {
     if (values[key] !== undefined) result[key] = values[key]
   }
   return result
@@ -43,15 +43,17 @@ export function subscribeToEvents(handler: (items: ChurchEvent[]) => void) {
 
 export async function createEvent(input: Omit<ChurchEvent, 'id' | 'createdAt'>) {
   if (!db) throw new Error('Firebase is not configured.')
-  return addDoc(collection(db, 'events'), {
-    ...stripUndefined(input as Record<string, unknown>),
+  const data = {
+    ...stripUndefined({ ...input }),
     createdAt: serverTimestamp(),
-  })
+  }
+  return addDoc(collection(db, 'events'), data)
 }
 
 export async function updateEvent(id: string, input: Partial<ChurchEvent>) {
   if (!db) throw new Error('Firebase is not configured.')
-  return updateDoc(doc(db, 'events', id), stripUndefined(input as Record<string, unknown>))
+  const data = stripUndefined({ ...input })
+  return updateDoc(doc(db, 'events', id), data)
 }
 
 export async function deleteEvent(id: string) {
